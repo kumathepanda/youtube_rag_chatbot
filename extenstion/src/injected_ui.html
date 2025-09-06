@@ -1,0 +1,23 @@
+<!-- This HTML will be dynamically injected into the YouTube page -->
+<div id="rag-chat-container" class="yt-rag-chat-container">
+    <div id="rag-chat-header" class="yt-rag-chat-header">
+        <span>Chat with Video</span>
+        <button id="rag-chat-toggle-btn">-</button>
+    </div>
+    <div id="rag-chat-body" class="yt-rag-chat-body">
+        <div id="rag-chat-messages" class="yt-rag-chat-messages">
+            <!-- Initial state: Process button -->
+            <div id="rag-initial-view" class="rag-initial-view">
+                <button id="rag-process-video-btn" class="rag-process-btn">Process Video</button>
+                <p id="rag-status-text" class="rag-status-text"></p>
+            </div>
+            <!-- Chat messages will be appended here -->
+        </div>
+        <form id="rag-chat-form" class="yt-rag-chat-form">
+            <input type="text" id="rag-chat-input" placeholder="Ask a question..." autocomplete="off" disabled>
+            <button type="submit" id="rag-chat-send-btn" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </form>
+    </div>
+</div>
