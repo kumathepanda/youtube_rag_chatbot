@@ -1,6 +1,6 @@
 from youtube_transcript_api import YouTubeTranscriptApi,TranscriptsDisabled
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEndpointEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from dotenv import load_dotenv
 load_dotenv()
@@ -14,8 +14,10 @@ try:
     full_text = " ".join([d.text for d in docs])
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000,chunk_overlap=200)
     chunks = splitter.create_documents([full_text])
-    embeddings = HuggingFaceEndpointEmbeddings(repo_id="sentence-transformers/all-MiniLM-L6-v2")
-    vector_store = Chroma(persist_directory="storage/vectorstore",collection_name="Transcript_details",embedding_function=embeddings)
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    vector_store = Chroma(persist_directory="../storage/vectorstore",collection_name="Transcript_details",embedding_function=embeddings)
+    vector_store.add_documents(chunks)
+    print("--------------------- RAN SUCCESSFULLY ----------------------------")
 except TranscriptsDisabled:
     print("No captions available for this video")
 
