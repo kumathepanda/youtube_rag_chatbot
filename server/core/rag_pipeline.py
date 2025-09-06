@@ -4,13 +4,14 @@ from langchain_chroma import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
+from config import LLM_MODEL_NAME,MODEL_TEMPERATURE,EMBEDDING_MODEL_NAME,VECTOR_STORE_ROOT_DIR
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from dotenv import load_dotenv
 
 load_dotenv()
 
-llm = ChatGroq(model_name="llama-3.1-8b-instant",temperature=0.4)
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+llm = ChatGroq(model_name=LLM_MODEL_NAME,temperature=MODEL_TEMPERATURE)
+embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_NAME)
 
 def get_rag_response(question, video_id):
     """
@@ -18,9 +19,7 @@ def get_rag_response(question, video_id):
     """
     try:
         
-        current_dir = os.path.dirname(os.path.realpath(__file__))
-        server_dir = os.path.dirname(current_dir)
-        persist_directory = os.path.join(server_dir, "storage", "vectorstore", video_id)
+        persist_directory = os.path.join(VECTOR_STORE_ROOT_DIR, video_id)
 
         if not os.path.exists(persist_directory):
             return "Error: Video has not been processed yet. Please process the video first."

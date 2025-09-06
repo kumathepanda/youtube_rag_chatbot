@@ -4,7 +4,7 @@ from core.rag_pipeline import get_rag_response
 
 app = Flask(__name__)
 
-@app.route('/process-video',method=['POST'])
+@app.route('/process-video',methods=['POST'])
 def process_video_route():
     data = request.get_json()
     video_id = data.get('videoId')
@@ -19,7 +19,7 @@ def process_video_route():
         return jsonify({"error":"failed to process the video Id"}) , 500
     
 
-@app.route('/chat',method=['POST'])
+@app.route('/chat',methods=['POST'])
 def chat_route():
     data = request.get_json()
     video_id = data.get('videoId')
@@ -35,4 +35,4 @@ def chat_route():
 
 if __name__=='__main__':
     app.run(host='0.0.0.0',port=5000,debug=True)
-    
+
