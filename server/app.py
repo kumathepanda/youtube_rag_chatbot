@@ -1,21 +1,36 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from dotenv import load_dotenv
+from pinecone import Pinecone
 from core.text_preprocessing import process_video_transcript, get_video_language_info
 from core.rag_pipeline import get_rag_response
-from config import VECTOR_STORE_ROOT_DIR 
-import os
+
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+pc = Pinecone(api_key=pinecone_api_key)
+index_name = "talktube" 
+
 @app.route('/video_status/<video_id>', methods=['GET'])
 def video_status(video_id):
-    """Checks if a vector store for the given video ID already exists."""
-    persist_directory = os.path.join(VECTOR_STORE_ROOT_DIR, video_id)
-    if os.path.exists(persist_directory):
-        return jsonify({"status": "processed"})
-    else:
-        return jsonify({"status": "not_processed"})
+    """Checks if vectors for the given video ID exist in Pinecone."""
+    try:
+        index = pc.Index(index_name)
+        stats = index.describe_index_stats()
+        # Check if the video_id exists as a namespace in the index stats
+        if video_id in stats.get('namespaces', {}):
+             return jsonify({"status": "processed"})
+        else:
+             return jsonify({"status": "not_processed"})
+    except Exception as e:
+        print(f"Error checking Pinecone status: {e}")
+        return jsonify({"status": "not_processed", "error": str(e)})
 
 @app.route('/video_languages/<video_id>', methods=['GET'])
 def video_languages(video_id):
@@ -35,17 +50,12 @@ def video_languages(video_id):
 
 @app.route('/process-video', methods=['POST'])
 def process_video_route():
-    """Process video transcript with translation support."""
+    """Process video transcript and store in Pinecone."""
     data = request.get_json()
     video_id = data.get('videoId')
 
     if not video_id:
         return jsonify({"error": "Video ID is required"}), 400
-    
-    # Check if already processed
-    persist_directory = os.path.join(VECTOR_STORE_ROOT_DIR, video_id)
-    if os.path.exists(persist_directory):
-        return jsonify({"message": f"Video {video_id} already processed", "status": "already_processed"})
     
     try:
         success = process_video_transcript(video_id)
@@ -57,7 +67,7 @@ def process_video_route():
             })
         else:
             return jsonify({
-                "error": "Failed to process video. This could be due to: no transcripts available, transcripts disabled, or translation failed",
+                "error": "Failed to process video. See server logs for details.",
                 "status": "failed"
             }), 500
             
