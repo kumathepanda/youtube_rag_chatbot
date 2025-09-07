@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "TalkToTube",
+  "version": "1.0",
+  "description": "Chat with any YouTube video by asking questions about its content.",
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "48": "icons/icon48.png"
+    }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/watch?v=*"],
+      "css": ["src/style.css"],
+      "js": [
+        "src/lib/marked.min.js",
+        "src/content_script.js"
+      ]
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["src/injected_ui.html"],
+      "matches": ["https://www.youtube.com/*"]
+    }
+  ],
+
+  "host_permissions": [
+    "http://127.0.0.1:5000/*"
+  ]
+}
+

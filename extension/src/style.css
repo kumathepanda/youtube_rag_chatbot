@@ -1,9 +1,20 @@
+/* --- YouTube Color Palette --- */
+:root {
+    --yt-background-primary: #0f0f0f;
+    --yt-background-secondary: #272727;
+    --yt-background-tertiary: #3f3f3f;
+    --yt-text-primary: #f1f1f1;
+    --yt-text-secondary: #aaaaaa;
+    --yt-brand-red: #ff0000;
+    --yt-border-color: #3f3f3f;
+}
+
 /* --- Popup Styles --- */
 .popup-body {
     width: 250px;
     height: auto;
-    background-color: #282828;
-    color: #fff;
+    background-color: var(--yt-background-secondary);
+    color: var(--yt-text-primary);
     font-family: Arial, sans-serif;
     text-align: center;
     padding: 10px;
@@ -40,8 +51,8 @@
     bottom: 20px;
     right: 20px;
     z-index: 9999;
-    background-color: #212121;
-    border: 1px solid #444;
+    background-color: var(--yt-background-primary);
+    border: 1px solid var(--yt-border-color);
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     display: flex;
@@ -52,8 +63,8 @@
 }
 
 .yt-rag-chat-header {
-    background-color: #333;
-    color: #fff;
+    background-color: var(--yt-background-secondary);
+    color: var(--yt-text-primary);
     padding: 10px 15px;
     font-weight: bold;
     cursor: pointer;
@@ -65,7 +76,7 @@
 #rag-chat-toggle-btn {
     background: none;
     border: none;
-    color: #fff;
+    color: var(--yt-text-primary);
     font-size: 20px;
     cursor: pointer;
 }
@@ -87,7 +98,7 @@
     flex-grow: 1;
     padding: 15px;
     overflow-y: auto;
-    color: #eee;
+    color: var(--yt-text-primary);
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -98,7 +109,7 @@
     width: 6px;
 }
 .yt-rag-chat-messages::-webkit-scrollbar-track {
-    background: #212121;
+    background: var(--yt-background-primary);
 }
 .yt-rag-chat-messages::-webkit-scrollbar-thumb {
     background: #555;
@@ -115,7 +126,7 @@
 }
 
 .rag-process-btn {
-    background-color: #4CAF50;
+    background-color: var(--yt-brand-red);
     color: white;
     padding: 12px 20px;
     border: none;
@@ -127,7 +138,7 @@
 }
 
 .rag-process-btn:hover {
-    background-color: #45a049;
+    filter: brightness(0.9);
 }
 
 .rag-process-btn:disabled {
@@ -138,7 +149,7 @@
 .rag-status-text {
     margin-top: 10px;
     font-size: 14px;
-    color: #aaa;
+    color: var(--yt-text-secondary);
 }
 
 /* Chat message styles */
@@ -150,15 +161,15 @@
 }
 
 .rag-chat-message.user {
-    background-color: #3f51b5;
+    background-color: var(--yt-brand-red);
     color: white;
     align-self: flex-end;
     border-bottom-right-radius: 4px;
 }
 
 .rag-chat-message.bot {
-    background-color: #333;
-    color: #eee;
+    background-color: var(--yt-background-secondary);
+    color: var(--yt-text-primary);
     align-self: flex-start;
     border-bottom-left-radius: 4px;
 }
@@ -172,8 +183,8 @@
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: #9880ff;
-  color: #9880ff;
+  background-color: var(--yt-text-secondary);
+  color: var(--yt-text-secondary);
   animation: dotFlashing 1s infinite linear alternate;
   animation-delay: .5s;
 }
@@ -188,8 +199,8 @@
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: #9880ff;
-  color: #9880ff;
+  background-color: var(--yt-text-secondary);
+  color: var(--yt-text-secondary);
   animation: dotFlashing 1s infinite alternate;
   animation-delay: 0s;
 }
@@ -198,17 +209,17 @@
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: #9880ff;
-  color: #9880ff;
+  background-color: var(--yt-text-secondary);
+  color: var(--yt-text-secondary);
   animation: dotFlashing 1s infinite alternate;
   animation-delay: 1s;
 }
 @keyframes dotFlashing {
   0% {
-    background-color: #9880ff;
+    background-color: var(--yt-text-secondary);
   }
   50%, 100% {
-    background-color: #4d3c7e;
+    background-color: var(--yt-background-tertiary);
   }
 }
 
@@ -217,39 +228,39 @@
 .yt-rag-chat-form {
     display: flex;
     padding: 10px;
-    border-top: 1px solid #444;
+    border-top: 1px solid var(--yt-border-color);
 }
 
 #rag-chat-input {
     flex-grow: 1;
-    background-color: #333;
-    border: 1px solid #555;
+    background-color: var(--yt-background-secondary);
+    border: 1px solid var(--yt-border-color);
     border-radius: 20px;
     padding: 10px 15px;
-    color: #fff;
+    color: var(--yt-text-primary);
     font-size: 14px;
 }
 
 #rag-chat-input:focus {
     outline: none;
-    border-color: #3f51b5;
+    border-color: var(--yt-brand-red);
 }
 
 #rag-chat-input:disabled {
-    background-color: #2a2a2a;
+    background-color: #1a1a1a;
 }
 
 #rag-chat-send-btn {
     background: none;
     border: none;
-    color: #aaa;
+    color: var(--yt-text-secondary);
     margin-left: 10px;
     cursor: pointer;
     transition: color 0.2s;
 }
 
 #rag-chat-send-btn:hover:not(:disabled) {
-    color: #3f51b5;
+    color: var(--yt-brand-red);
 }
 
 #rag-chat-send-btn:disabled {

@@ -27,6 +27,37 @@ async function injectUI() {
     }
 }
 
+function makeDraggable() {
+    const chatContainer = document.getElementById('rag-chat-container');
+    const chatHeader = document.getElementById('rag-chat-header');
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    chatHeader.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - chatContainer.getBoundingClientRect().left;
+        offsetY = e.clientY - chatContainer.getBoundingClientRect().top;
+        chatContainer.style.cursor = 'grabbing';
+        document.body.style.userSelect = 'none'; 
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const x = e.clientX - offsetX;
+        const y = e.clientY - offsetY;
+        chatContainer.style.left = `${x}px`;
+        chatContainer.style.top = `${y}px`;
+        chatContainer.style.bottom = 'auto';
+        chatContainer.style.right = 'auto';
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        chatContainer.style.cursor = 'default';
+        document.body.style.userSelect = 'auto';
+    });
+}
+
 // --- Event Listeners ---
 function addEventListeners() {
     document.getElementById('rag-chat-toggle-btn').addEventListener('click', toggleChatWindow);
@@ -44,7 +75,12 @@ function displayMessage(text, sender) {
     const messagesContainer = document.getElementById('rag-chat-messages');
     const messageDiv = document.createElement('div');
     messageDiv.className = `rag-chat-message ${sender}`;
-    messageDiv.textContent = text;
+    if (sender === 'bot') {
+        messageDiv.innerHTML = marked.parse(text);
+    } else {
+        messageDiv.textContent = text;
+    }
+    
     messagesContainer.appendChild(messageDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight; // Auto-scroll
 }
