@@ -25,4 +25,5 @@ Flask-Cors
 gunicorn
 #Chroma 
 langchain_chroma
+langchain_pinecone
 
