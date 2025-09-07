@@ -73,6 +73,16 @@ function toggleChatWindow() {
 
 function displayMessage(text, sender) {
     const messagesContainer = document.getElementById('rag-chat-messages');
+    
+    const messageContainer = document.createElement('div');
+    messageContainer.className = `rag-chat-message-container ${sender}`;
+
+    if (sender === 'bot') {
+        const avatar = document.createElement('div');
+        avatar.className = 'bot-avatar';
+        messageContainer.appendChild(avatar);
+    }
+    
     const messageDiv = document.createElement('div');
     messageDiv.className = `rag-chat-message ${sender}`;
     if (sender === 'bot') {
@@ -81,7 +91,8 @@ function displayMessage(text, sender) {
         messageDiv.textContent = text;
     }
     
-    messagesContainer.appendChild(messageDiv);
+    messageContainer.appendChild(messageDiv);
+    messagesContainer.appendChild(messageContainer);
     messagesContainer.scrollTop = messagesContainer.scrollHeight; // Auto-scroll
 }
 

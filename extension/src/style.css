@@ -153,24 +153,45 @@
 }
 
 /* Chat message styles */
+.rag-chat-message-container {
+    display: flex;
+    align-items: flex-end;
+    max-width: 90%;
+}
+
+.rag-chat-message-container.user {
+    align-self: flex-end;
+}
+
+.rag-chat-message-container.bot {
+    align-self: flex-start;
+}
+
+.bot-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-image: url('chrome-extension://__MSG_@@extension_id__/icons/icon48.png');
+    background-size: cover;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
 .rag-chat-message {
     padding: 10px 15px;
     border-radius: 18px;
-    max-width: 80%;
     word-wrap: break-word;
 }
 
 .rag-chat-message.user {
-    background-color: var(--yt-brand-red);
+    background-color: var(--yt-background-tertiary);
     color: white;
-    align-self: flex-end;
     border-bottom-right-radius: 4px;
 }
 
 .rag-chat-message.bot {
     background-color: var(--yt-background-secondary);
     color: var(--yt-text-primary);
-    align-self: flex-start;
     border-bottom-left-radius: 4px;
 }
 

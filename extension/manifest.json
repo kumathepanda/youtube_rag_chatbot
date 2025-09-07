@@ -30,7 +30,10 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["src/injected_ui.html"],
+      "resources": [
+        "src/injected_ui.html",
+        "icons/icon48.png" 
+      ],
       "matches": ["https://www.youtube.com/*"]
     }
   ],
@@ -39,4 +42,3 @@
     "http://127.0.0.1:5000/*"
   ]
 }
-
