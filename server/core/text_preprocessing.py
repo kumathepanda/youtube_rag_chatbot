@@ -1,7 +1,7 @@
 import os
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain_chroma import Chroma
 from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
@@ -185,7 +185,7 @@ def process_video_transcript(video_id):
         chunks = splitter.create_documents([transcript_text])
         
         # Create embeddings
-        embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_NAME)
+        embeddings = HuggingFaceInferenceAPIEmbeddings(model_name=EMBEDDING_MODEL_NAME)
         
         # Store in vector database
         Chroma.from_documents(

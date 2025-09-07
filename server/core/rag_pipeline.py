@@ -1,7 +1,7 @@
 import os
 from langchain_groq import ChatGroq
 from langchain_chroma import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from config import LLM_MODEL_NAME,MODEL_TEMPERATURE,EMBEDDING_MODEL_NAME,VECTOR_STORE_ROOT_DIR
@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 llm = ChatGroq(model_name=LLM_MODEL_NAME,temperature=MODEL_TEMPERATURE)
-embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_NAME)
+embeddings = HuggingFaceInferenceAPIEmbeddings(model_name=EMBEDDING_MODEL_NAME)
 
 def get_rag_response(question, video_id):
     """
