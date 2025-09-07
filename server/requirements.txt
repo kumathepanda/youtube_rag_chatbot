@@ -21,6 +21,7 @@ python-dotenv
 
 #flask
 flask
-
+Flask-Cors
 #Chroma 
 langchain_chroma
+

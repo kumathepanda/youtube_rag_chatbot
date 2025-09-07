@@ -1,8 +1,22 @@
 from flask import Flask,jsonify,request
-from core.text_preprocessing import get_transcript_of_video
+from flask_cors import CORS
+from core.text_preprocessing import process_video_transcript
 from core.rag_pipeline import get_rag_response
-
+from config import VECTOR_STORE_ROOT_DIR 
+import os
 app = Flask(__name__)
+
+CORS(app)
+
+@app.route('/video_status/<video_id>', methods=['GET'])
+def video_status(video_id):
+    """Checks if a vector store for the given video ID already exists."""
+    persist_directory = os.path.join(VECTOR_STORE_ROOT_DIR, video_id)
+    if os.path.exists(persist_directory):
+        return jsonify({"status": "processed"})
+    else:
+        return jsonify({"status": "not_processed"})
+
 
 @app.route('/process-video',methods=['POST'])
 def process_video_route():
@@ -11,7 +25,7 @@ def process_video_route():
 
     if not video_id:
         return jsonify({"error":"Video Id is required"}) , 400
-    success = get_transcript_of_video(video_id)
+    success = process_video_transcript(video_id)
 
     if success:
         return jsonify({"message":f"video returned successfully {video_id}"})

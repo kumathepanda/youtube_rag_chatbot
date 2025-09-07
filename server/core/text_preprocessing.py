@@ -7,7 +7,7 @@ from config import VECTOR_STORE_ROOT_DIR,EMBEDDING_MODEL_NAME,CHUNK_SIZE,CHUNK_O
 from dotenv import load_dotenv
 load_dotenv()
 
-def get_transcript_of_video(video_id):
+def process_video_transcript(video_id):
     try:
         persist_directory = os.path.join(VECTOR_STORE_ROOT_DIR, video_id)
         yt_api = YouTubeTranscriptApi()
