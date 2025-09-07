@@ -141,17 +141,12 @@ def get_available_transcript(video_id):
 
 def process_video_transcript(video_id):
     """
-    Enhanced function that processes video transcripts with translation support.
+    Processes video transcript and stores embeddings in Pinecone.
     """
     try:
-        persist_directory = os.path.join(VECTOR_STORE_ROOT_DIR, video_id)
+        # NOTE: The old 'os.path.exists' check for a local directory has been removed.
+        # This is now handled correctly by the /video_status endpoint.
         
-        # Check if already processed
-        if os.path.exists(persist_directory):
-            print(f"Video {video_id} already processed")
-            return True
-        
-        # Get available transcript
         transcript_text, language_code = get_available_transcript(video_id)
         
         if transcript_text is None:
@@ -167,7 +162,6 @@ def process_video_transcript(video_id):
             except Exception as e:
                 print(f"Translation failed: {e}")
                 print("Proceeding with original text...")
-                # Continue with original text if translation fails
         elif language_code == 'unknown':
             print("Language unknown, attempting translation anyway...")
             try:
@@ -184,10 +178,13 @@ def process_video_transcript(video_id):
         )
         chunks = splitter.create_documents([transcript_text])
         
-        # Create embeddings
-        embeddings = HuggingFaceInferenceAPIEmbeddings(model_name=EMBEDDING_MODEL_NAME)
+        # BUG FIX: Added the api_key from environment variables.
+        embeddings = HuggingFaceInferenceAPIEmbeddings(
+            api_key=os.getenv("HUGGINGFACEHUB_API_TOKEN"),
+            model_name=EMBEDDING_MODEL_NAME
+        )
         
-        # Store in vector database
+        # Store in Pinecone vector database
         Pinecone.from_documents(
             documents=chunks,
             embedding=embeddings,
@@ -199,7 +196,7 @@ def process_video_transcript(video_id):
         return True
         
     except Exception as e:
-        print(f"Error processing video transcript: {e}")
+        print(f"Error processing video transcript for Pinecone: {e}")
         return False
 
 def get_video_language_info(video_id):
