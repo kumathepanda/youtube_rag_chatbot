@@ -12,16 +12,23 @@ from config import LLM_MODEL_NAME, MODEL_TEMPERATURE, EMBEDDING_MODEL_NAME
 
 load_dotenv()
 
-# Initialize LLM
-llm = ChatGroq(model_name=LLM_MODEL_NAME, temperature=MODEL_TEMPERATURE)
 index_name = "talktube"  # Your Pinecone index name
 
-def get_rag_response(question, video_id):
+def get_rag_response(question, video_id, api_key):
     """
     Finds the answer to a question using the RAG pipeline with Pinecone.
+    This function now uses a user-provided API key for the LLM.
     """
     try:
+        # Initialize LLM inside the function with the user-provided API key
+        llm = ChatGroq(
+            model_name=LLM_MODEL_NAME, 
+            temperature=MODEL_TEMPERATURE,
+            groq_api_key=api_key  # Use the key passed from the request
+        )
+
         # Initialize embeddings using the Hugging Face Inference API
+        # (This uses a separate, developer-provided API key from .env)
         embeddings = HuggingFaceInferenceAPIEmbeddings(
             api_key=os.getenv("HUGGINGFACEHUB_API_TOKEN"),
             model_name=EMBEDDING_MODEL_NAME
@@ -37,7 +44,7 @@ def get_rag_response(question, video_id):
         # Create a retriever from the vector store
         base_retriever = vector_store.as_retriever(search_kwargs={"k": 5})
         
-        # Optional: Use a compressor for more relevant results
+        # Optional: Use a compressor for more relevant results, using the user-specific LLM
         document_compressor = LLMChainExtractor.from_llm(llm)
         compression_retriever = ContextualCompressionRetriever(
             base_compressor=document_compressor,
@@ -62,7 +69,7 @@ def get_rag_response(question, video_id):
             Question: {input}
         """)
         
-        # Create the RAG chain
+        # Create the RAG chain using the user-specific LLM
         document_chain = create_stuff_documents_chain(llm, prompt)
         retrieval_chain = create_retrieval_chain(compression_retriever, document_chain)
 
@@ -72,6 +79,9 @@ def get_rag_response(question, video_id):
         return response["answer"]
 
     except Exception as e:
+        # Handle specific API key errors from Groq
+        if "invalid api key" in str(e).lower():
+            return "Error: The provided Groq API key is invalid. Please check your key in the extension settings."
         # Check for a specific error when a namespace (video_id) doesn't exist yet
         if "provided namespace" in str(e) and "does not exist" in str(e):
              return "Error: This video has not been processed yet. Please click 'Process Video' first."

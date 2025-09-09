@@ -1,4 +1,5 @@
 /* --- YouTube Color Palette --- */
+/* --- YouTube Color Palette --- */
 :root {
     --yt-background-primary: #0f0f0f;
     --yt-background-secondary: #272727;
@@ -287,4 +288,27 @@
 #rag-chat-send-btn:disabled {
     cursor: not-allowed;
     color: #555;
+}
+
+/* Styles for API Key Input */
+#rag-api-key-input {
+    background-color: var(--yt-background-secondary);
+    border: 1px solid var(--yt-border-color);
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: var(--yt-text-primary);
+    font-size: 14px;
+    width: 80%;
+    margin-bottom: 10px;
+}
+
+#rag-api-key-input:focus {
+    outline: none;
+    border-color: var(--yt-brand-red);
+}
+
+.api-key-label {
+    font-size: 12px;
+    color: var(--yt-text-secondary);
+    margin-bottom: 10px;
 }

@@ -1,4 +1,3 @@
-<!-- This HTML will be dynamically injected into the YouTube page -->
 <div id="rag-chat-container" class="yt-rag-chat-container">
     <div id="rag-chat-header" class="yt-rag-chat-header">
         <span>Chat with Video</span>
@@ -6,13 +5,19 @@
     </div>
     <div id="rag-chat-body" class="yt-rag-chat-body">
         <div id="rag-chat-messages" class="yt-rag-chat-messages">
-            <!-- Initial state: Process button -->
-            <div id="rag-initial-view" class="rag-initial-view">
+            <div id="rag-api-key-view" class="rag-initial-view">
+                <h3>Enter Groq API Key</h3>
+                <p class="api-key-label">To use this extension, please provide your own Groq API key.</p>
+                <input type="password" id="rag-api-key-input" placeholder="gsk_...">
+                <button id="rag-save-api-key-btn" class="rag-process-btn">Save Key</button>
+                <p id="rag-api-key-status" class="rag-status-text"></p>
+            </div>
+
+            <div id="rag-initial-view" class="rag-initial-view" style="display: none;">
                 <button id="rag-process-video-btn" class="rag-process-btn">Process Video</button>
                 <p id="rag-status-text" class="rag-status-text"></p>
             </div>
-            <!-- Chat messages will be appended here -->
-        </div>
+            </div>
         <form id="rag-chat-form" class="yt-rag-chat-form">
             <input type="text" id="rag-chat-input" placeholder="Ask a question..." autocomplete="off" disabled>
             <button type="submit" id="rag-chat-send-btn" disabled>

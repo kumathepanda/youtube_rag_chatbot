@@ -5,23 +5,29 @@ from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain_pinecone import Pinecone
 from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
-from config import VECTOR_STORE_ROOT_DIR, EMBEDDING_MODEL_NAME, CHUNK_SIZE, CHUNK_OVERLAP, LLM_MODEL_NAME, MODEL_TEMPERATURE
+from config import VECTOR_STORE_ROOT_DIR, EMBEDDING_MODEL_NAME, CHUNK_SIZE, CHUNK_OVERLAP, LLM_MODEL_NAME
 from dotenv import load_dotenv
 import time
 
 load_dotenv()
 
-# Initialize the LLM for translation
-translation_llm = ChatGroq(model_name=LLM_MODEL_NAME, temperature=0.1)  # Lower temperature for translation accuracy
 index_name = "talktube"
-def detect_and_translate_transcript(transcript_text, source_language):
+
+def detect_and_translate_transcript(transcript_text, source_language, api_key):
     """
-    Translates non-English transcript to English using the LLM.
+    Translates non-English transcript to English using the LLM with a user-provided API key.
     """
     if source_language == 'en':
         return transcript_text
     
     print(f"Translating transcript from {source_language} to English...")
+    
+    # Initialize the LLM for translation inside the function with the user's key
+    translation_llm = ChatGroq(
+        model_name=LLM_MODEL_NAME, 
+        temperature=0.1,  # Lower temperature for translation accuracy
+        groq_api_key=api_key # Use the provided key
+    )
     
     # Split large text into smaller chunks for translation
     max_chunk_size = 3000  # Adjust based on your LLM's token limit
@@ -96,42 +102,29 @@ def get_available_transcript(video_id):
         
         # First, try to get English transcript directly
         try:
-            fetched_transcript = ytt_api.fetch(video_id, languages=['en'])
-            full_text = " ".join([snippet.text for snippet in fetched_transcript])
+            fetched_transcript = ytt_api.get_transcript(video_id, languages=['en'])
+            full_text = " ".join([snippet['text'] for snippet in fetched_transcript])
             print("Found English transcript")
             return full_text, 'en'
         except NoTranscriptFound:
             print("No English transcript found, looking for other languages...")
         
         # If no English transcript, list available transcripts and get the first one
-        try:
-            transcript_list = ytt_api.list(video_id)
-            
-            if not transcript_list:
-                print("No transcripts available for this video")
-                return None, None
-            
-            # Get the first available transcript
-            first_transcript = list(transcript_list)[0]
-            fetched_transcript = first_transcript.fetch()
-            full_text = " ".join([snippet.text for snippet in fetched_transcript])
-            language_code = first_transcript.language_code
-            
-            print(f"Found transcript in language: {language_code}")
-            return full_text, language_code
-            
-        except Exception as e:
-            print(f"Error getting transcript list: {e}")
-            # Final fallback: try to get any transcript without specifying language
-            try:
-                fetched_transcript = ytt_api.fetch(video_id)
-                full_text = " ".join([snippet.text for snippet in fetched_transcript])
-                print("Found transcript (language unknown)")
-                return full_text, 'unknown'
-            except Exception as fallback_error:
-                print(f"Final fallback also failed: {fallback_error}")
-                return None, None
+        transcript_list = ytt_api.list_transcripts(video_id)
         
+        if not transcript_list:
+            print("No transcripts available for this video")
+            return None, None
+        
+        # Get the first available transcript
+        first_transcript = list(transcript_list)[0]
+        fetched_transcript = first_transcript.fetch()
+        full_text = " ".join([snippet['text'] for snippet in fetched_transcript])
+        language_code = first_transcript.language_code
+        
+        print(f"Found transcript in language: {language_code}")
+        return full_text, language_code
+            
     except TranscriptsDisabled:
         print("Transcripts are disabled for this video")
         return None, None
@@ -139,33 +132,23 @@ def get_available_transcript(video_id):
         print(f"Error fetching transcript: {e}")
         return None, None
 
-def process_video_transcript(video_id):
+def process_video_transcript(video_id, api_key):
     """
     Processes video transcript and stores embeddings in Pinecone.
+    Requires a user-provided API key for potential translation.
     """
     try:
-        # NOTE: The old 'os.path.exists' check for a local directory has been removed.
-        # This is now handled correctly by the /video_status endpoint.
-        
         transcript_text, language_code = get_available_transcript(video_id)
         
         if transcript_text is None:
             print("No transcript available for processing")
             return False
         
-        # Translate if not in English
-        if language_code != 'en' and language_code != 'unknown':
+        # Translate if not in English, passing the user's API key
+        if language_code and language_code != 'en':
             print(f"Translating from {language_code} to English...")
             try:
-                transcript_text = detect_and_translate_transcript(transcript_text, language_code)
-                print("Translation completed successfully")
-            except Exception as e:
-                print(f"Translation failed: {e}")
-                print("Proceeding with original text...")
-        elif language_code == 'unknown':
-            print("Language unknown, attempting translation anyway...")
-            try:
-                transcript_text = detect_and_translate_transcript(transcript_text, 'unknown')
+                transcript_text = detect_and_translate_transcript(transcript_text, language_code, api_key)
                 print("Translation completed successfully")
             except Exception as e:
                 print(f"Translation failed: {e}")
@@ -178,7 +161,7 @@ def process_video_transcript(video_id):
         )
         chunks = splitter.create_documents([transcript_text])
         
-        # BUG FIX: Added the api_key from environment variables.
+        # Initialize embeddings (this uses the developer's key from .env)
         embeddings = HuggingFaceInferenceAPIEmbeddings(
             api_key=os.getenv("HUGGINGFACEHUB_API_TOKEN"),
             model_name=EMBEDDING_MODEL_NAME
@@ -205,7 +188,7 @@ def get_video_language_info(video_id):
     """
     try:
         ytt_api = YouTubeTranscriptApi()
-        transcript_list = ytt_api.list(video_id)
+        transcript_list = ytt_api.list_transcripts(video_id)
         
         available_languages = []
         for transcript in transcript_list:
